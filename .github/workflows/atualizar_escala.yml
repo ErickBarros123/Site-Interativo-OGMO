@@ -32,4 +32,4 @@ jobs:
           git config --global user.email "robo@ogmo.local"
           git add novo_data.json
           git commit -m "Atualização automática de escalas [skip ci]" || exit 0
-          git push 
+          git push
