@@ -22,7 +22,7 @@ jobs:
           pip install requests beautifulsoup4 pandas openpyxl
 
       - name: Executar script de varredura
-        run: python dExtrator.py
+        run: python Extrator.py
 
       - name: Salvar e atualizar JSON no GitHub
         env:
