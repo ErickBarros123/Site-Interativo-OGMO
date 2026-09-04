@@ -3,12 +3,21 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import time
+import os
+import json
 
 JSON_DATABASE = "novo_data.json"
 
 def carregar_banco_dados():
+    if not os.path.exists(JSON_DATABASE):
+        # Cria uma lista vazia automaticamente se o arquivo não existir
+        with open(JSON_DATABASE, "w", encoding="utf-8") as f:
+            json.dump([], f)
     with open(JSON_DATABASE, "r", encoding="utf-8") as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return []
 
 def salvar_banco_dados(dados):
     with open(JSON_DATABASE, "w", encoding="utf-8") as f:
