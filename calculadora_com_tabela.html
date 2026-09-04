@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora & Tabela de Taxas | Estiva</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' } }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans min-h-screen p-4 sm:p-8">
+
+  <div class="max-w-6xl mx-auto space-y-8">
+    
+    <!-- NAVEGAÇÃO ENTRE ABAS -->
+    <div class="flex justify-center border-b border-slate-200 dark:border-slate-800">
+      <nav class="flex gap-4" aria-label="Tabs">
+        <button id="btnTabCalc" onclick="trocarAba('calc')" class="border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold py-3 px-6 text-sm sm:text-base flex items-center gap-2 transition-colors">
+          <i class="fa-solid fa-calculator"></i> Calculadora
+        </button>
+        <button id="btnTabTabela" onclick="trocarAba('tabela')" class="border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-semibold py-3 px-6 text-sm sm:text-base flex items-center gap-2 transition-colors">
+          <i class="fa-solid fa-table-list"></i> Tabela de Taxas e Cotas
+        </button>
+      </nav>
+    </div>
+
+    <!-- SEÇÃO 1: CALCULADORA -->
+    <div id="abaCalculadora" class="w-full max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
+      <div class="flex items-center gap-4 mb-8 border-b border-slate-100 dark:border-slate-800 pb-5">
+        <div class="p-3.5 bg-brand-500/10 rounded-xl text-brand-500 shadow-inner">
+          <i class="fa-solid fa-calculator text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Calculadora de Ganhos</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Simulador interativo baseado na convenção 2024</p>
+        </div>
+      </div>
+
+      <form id="calcForm" class="space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Categoria -->
+          <div>
+            <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">Categoria (Faina)</label>
+            <div class="relative">
+              <select id="categoria" onchange="atualizarSubFainas()" class="w-full appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow font-medium">
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subfaina -->
+          <div>
+            <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">Tipo Específico (Subfaina)</label>
+            <div class="relative">
+              <select id="subfaina" class="w-full appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow font-medium">
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Função -->
+          <div>
+            <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">Função Exercida</label>
+            <div class="relative">
+              <select id="funcao" class="w-full appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow font-medium">
+                <option value="porao">Trabalhador de Porão</option>
+                <option value="sinaleiro">Sinaleiro</option>
+                <option value="guindasteiro">Guindasteiro Bordo</option>
+                <option value="cm_porao">Contra-Mestre Porão</option>
+                <option value="cm_geral">Contra-Mestre Geral</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                <i class="fa-solid fa-chevron-down text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Peso -->
+          <div>
+            <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">Peso / Produção Manipulada (t)</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                <i class="fa-solid fa-weight-hanging"></i>
+              </div>
+              <input type="number" id="peso" step="0.01" placeholder="Ex: 1500" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow font-medium">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tipo Guindaste -->
+        <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+          <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 uppercase tracking-wider">Configuração da Operação</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label class="relative flex items-center p-4 border border-slate-300 dark:border-slate-600 rounded-xl cursor-pointer hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors">
+              <input type="radio" name="tipoGuindaste" value="terra" class="w-5 h-5 text-brand-600 focus:ring-brand-500 border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-700" checked>
+              <span class="ml-3 text-sm font-semibold text-slate-700 dark:text-slate-200 flex flex-col">
+                <span>Guindaste de Terra</span>
+                <span class="text-xs font-normal text-slate-500 dark:text-slate-400">Sem Guindasteiro</span>
+              </span>
+            </label>
+            <label class="relative flex items-center p-4 border border-slate-300 dark:border-slate-600 rounded-xl cursor-pointer hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors">
+              <input type="radio" name="tipoGuindaste" value="bordo" class="w-5 h-5 text-brand-600 focus:ring-brand-500 border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-700">
+              <span class="ml-3 text-sm font-semibold text-slate-700 dark:text-slate-200 flex flex-col">
+                <span>Guindaste de Bordo</span>
+                <span class="text-xs font-normal text-slate-500 dark:text-slate-400">Com 02 Guindasteiros</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-800 space-y-4">
+          <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">Adicionais</h3>
+          <div class="flex flex-col sm:flex-row gap-6">
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <div class="relative flex items-center">
+                <input type="checkbox" id="adicionalNoturno" class="peer sr-only">
+                <div class="w-6 h-6 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-600 rounded peer-checked:bg-brand-500 peer-checked:border-brand-500 transition"></div>
+                <i class="fa-solid fa-check absolute text-white text-sm left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+              </div>
+              <span class="text-sm font-semibold text-slate-600 dark:text-slate-300 group-hover:text-brand-500 transition-colors">Adicional Noturno (+25%)</span>
+            </label>
+            
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <div class="relative flex items-center">
+                <input type="checkbox" id="domingoFeriado" class="peer sr-only">
+                <div class="w-6 h-6 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-600 rounded peer-checked:bg-brand-500 peer-checked:border-brand-500 transition"></div>
+                <i class="fa-solid fa-check absolute text-white text-sm left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+              </div>
+              <span class="text-sm font-semibold text-slate-600 dark:text-slate-300 group-hover:text-brand-500 transition-colors">Domingo / Feriado (+100%)</span>
+            </label>
+          </div>
+        </div>
+
+        <button type="button" onclick="calcularGanhos()" class="w-full bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-brand-500/30 transform hover:-translate-y-0.5 transition-all duration-200">
+          <i class="fa-solid fa-money-check-dollar mr-2"></i> Calcular Contracheque
+        </button>
+      </form>
+
+      <!-- Resultado -->
+      <div id="resultadoContainer" class="hidden mt-8 transform transition-all duration-300 ease-out opacity-0 translate-y-4">
+        <div class="bg-gradient-to-br from-slate-100 to-white dark:from-slate-800 dark:to-slate-900 rounded-2xl p-6 sm:p-8 border-2 border-brand-500/20 shadow-2xl relative overflow-hidden">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <p class="text-sm font-bold uppercase tracking-widest text-brand-500 mb-1">Valor Estimado</p>
+              <h2 class="text-4xl sm:text-5xl font-black text-slate-800 dark:text-white" id="valorTotal">R$ 0,00</h2>
+            </div>
+            <div class="p-4 bg-brand-500/10 rounded-2xl text-brand-500 border border-brand-500/20">
+              <i class="fa-solid fa-sack-dollar text-3xl"></i>
+            </div>
+          </div>
+          
+          <div class="pt-6 border-t border-slate-200 dark:border-slate-700/80">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-list-check"></i> Detalhamento do Cálculo
+            </h4>
+            <div class="space-y-3 text-sm" id="detalhesCalculo"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 2: TABELA DE CONSULTA -->
+    <div id="abaTabela" class="hidden w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Tabela de Consulta Oficial</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Valores de taxas base e cotas de todas as mercadorias</p>
+        </div>
+
+        <!-- Barra de Busca e Filtro -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative">
+            <input type="text" id="inputBuscaTabela" onkeyup="filtrarTabela()" placeholder="Buscar faina ou código..." class="w-full sm:w-64 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela Responsiva -->
+      <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
+              <th class="p-3">Código</th>
+              <th class="p-3">Faina / Mercadoria</th>
+              <th class="p-3 text-right">Taxa Terra</th>
+              <th class="p-3 text-right">Taxa Bordo</th>
+              <th class="p-3 text-center">Porão</th>
+              <th class="p-3 text-center">Sinaleiro</th>
+              <th class="p-3 text-center">Guind.</th>
+              <th class="p-3 text-center">CM Porão</th>
+              <th class="p-3 text-center">CM Geral</th>
+            </tr>
+          </thead>
+          <tbody id="corpoTabelaTaxas" class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium text-slate-600 dark:text-slate-300">
+            <!-- Gerado via JS -->
+          </tbody>
+        </table>
+      </div>
+      
+      <p class="text-xs text-slate-400 mt-4 text-center sm:text-right">* Cotas representam o multiplicador aplicado à taxa base para cada função.</p>
+    </div>
+
+  </div>
+
+  <script>
+    // DADOS JSON DA PLANILHA COMPLETA
+    const DADOS_TABELA = [{"categoria": "1.1 - SACARIA", "codigo": "1.1.1", "faina": "Açúcar - Sacaria Solta", "taxaTerra": 1.26506, "taxaBordo": 1.26586, "cotaPorao": 1.0, "cotaSinaleiro": 1.0, "cotaGuindasteiro": 1.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.25}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.2", "faina": "Açúcar - Sacaria Pré-lingada", "taxaTerra": 1.26588, "taxaBordo": 1.26586, "cotaPorao": 1.0, "cotaSinaleiro": 1.0, "cotaGuindasteiro": 1.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.25}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.3", "faina": "Açúcar - Sacaria Solta com Spreader", "taxaTerra": 1.26506, "taxaBordo": 1.26506, "cotaPorao": 1.0, "cotaSinaleiro": 1.15, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.4", "faina": "Açúcar - Sacaria Pré-lingada com Spreader", "taxaTerra": 1.26586, "taxaBordo": 1.265, "cotaPorao": 1.0, "cotaSinaleiro": 1.15, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.5", "faina": "Açúcar - Sacaria Solta Sênior", "taxaTerra": 1.26586, "taxaBordo": 1.26586, "cotaPorao": 1.22, "cotaSinaleiro": 2.0, "cotaGuindasteiro": 2.0, "cotaCMPorao": 0.0, "cotaCMGeral": 2.0}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.6", "faina": "Açúcar - Sacaria Pré-lingada Sênior", "taxaTerra": 1.26586, "taxaBordo": 1.26586, "cotaPorao": 1.44, "cotaSinaleiro": 2.0, "cotaGuindasteiro": 2.0, "cotaCMPorao": 0.0, "cotaCMGeral": 2.0}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.7", "faina": "Açúcar - Sacaria 03 até 06 Pré-lingadas Sênior", "taxaTerra": 1.26586, "taxaBordo": 1.26586, "cotaPorao": 1.8, "cotaSinaleiro": 2.0, "cotaGuindasteiro": 2.5, "cotaCMPorao": 0.0, "cotaCMGeral": 2.0}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.8", "faina": "Cimento - Sacaria Solta", "taxaTerra": 1.08836, "taxaBordo": 1.35005, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.1 - SACARIA", "codigo": "1.1.9", "faina": "Cimento - Sacaria Pré-Lingado", "taxaTerra": 1.08836, "taxaBordo": 1.35005, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.2 - BOBINAS DE PAPEL", "codigo": "1.2.1", "faina": "BP - Com Implemento Manual", "taxaTerra": 1.70585, "taxaBordo": 1.89415, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.2 - BOBINAS DE PAPEL", "codigo": "1.2.2", "faina": "BP - Com Implemento Mecanizado", "taxaTerra": 1.93907, "taxaBordo": 2.15241, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.3 - CARGA UNITIZADA", "codigo": "1.3.1", "faina": "Demais Produtos", "taxaTerra": 0.96499, "taxaBordo": 1.07018, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.3 - CARGA UNITIZADA", "codigo": "1.3.2", "faina": "Gêneros Alimentícios", "taxaTerra": 0.93431, "taxaBordo": 1.07018, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.3 - CARGA UNITIZADA", "codigo": "1.3.3", "faina": "Carga em Big-Bag", "taxaTerra": 0.96499, "taxaBordo": 1.07018, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.3 - CARGA UNITIZADA", "codigo": "1.3.3", "faina": "Carga em Big-Bag (2 primeiros navios em Suape)", "taxaTerra": 0.93049, "taxaBordo": 1.03192, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.3 - CARGA UNITIZADA", "codigo": "1.3.4", "faina": "Algodão em Fardos", "taxaTerra": 1.51378, "taxaBordo": 1.68052, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.3 - CARGA UNITIZADA", "codigo": "1.3.5", "faina": "Madeiras Diversas", "taxaTerra": 1.0702, "taxaBordo": 1.0702, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.1", "faina": "Bobina de Aço", "taxaTerra": 0.77811, "taxaBordo": 0.87966, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.1.1", "faina": "Bobina de Aço - Cabotagem Porto do Recife", "taxaTerra": 0.72103, "taxaBordo": 0.81504, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.2", "faina": "Chapas de Aço c/ até 04 engates", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.3", "faina": "Chapas de Aço c/ até 06 engates", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.4", "faina": "Vergalhões de Aço c/ até 04 engates", "taxaTerra": 0.77745, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.5", "faina": "Vergalhões de Aço c/ até 06 engates", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.6", "faina": "Laminados c/ até 04 engates", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.7", "faina": "Laminados c/ até 06 engates", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.8", "faina": "Lingotes e Tarugos", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.9", "faina": "Trilhos e Tubos c/ até 04 engates", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.10", "faina": "Trilhos e Tubos c/ até 06 engates", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.11", "faina": "Sucata", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.12", "faina": "Sucata Naval", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.13", "faina": "Alumínio", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.4 - PRODUTOS SIDERÚRGICOS", "codigo": "1.4.14", "faina": "Outros Produtos Siderúrgicos", "taxaTerra": 0.77746, "taxaBordo": 0.87881, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.5 - CARGA FRIGORIFICADA", "codigo": "1.5.1", "faina": "Frigorificada - Solta", "taxaTerra": 2.34363, "taxaBordo": 2.34363, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.5 - CARGA FRIGORIFICADA", "codigo": "1.5.2", "faina": "Frigorificada - Unitizada", "taxaTerra": 2.34363, "taxaBordo": 2.34363, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.6 - CARGA GERAL", "codigo": "1.6.1", "faina": "Carga de Projeto", "taxaTerra": 1.35296, "taxaBordo": 1.35296, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.6 - CARGA GERAL", "codigo": "1.6.2", "faina": "Carga Geral em Navio", "taxaTerra": 1.48141, "taxaBordo": 1.66001, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.6 - CARGA GERAL", "codigo": "1.6.3", "faina": "Pedra de granito ou Pedra bruta", "taxaTerra": 1.41087, "taxaBordo": 1.45586, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.6 - CARGA GERAL", "codigo": "1.6.4", "faina": "C. Geral e Projeto em Balsa", "taxaTerra": 1.06441, "taxaBordo": 1.36296, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.7 - ROLL-ON/ROLL-OFF", "codigo": "1.7.1", "faina": "Veículos Pesados, Máquinas e Equipamentos (≥ 08 un.)", "taxaTerra": 0.0, "taxaBordo": 0.77495, "cotaPorao": 0.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.7 - ROLL-ON/ROLL-OFF", "codigo": "1.7.2", "faina": "Veículos Pesados, Máquinas e Equipamentos (≤ 07 un.)", "taxaTerra": 0.0, "taxaBordo": 0.77495, "cotaPorao": 0.0, "cotaSinaleiro": 0.0, "cotaGuindasteiro": 0.0, "cotaCMPorao": 0.0, "cotaCMGeral": 0.0}, {"categoria": "1.7 - ROLL-ON/ROLL-OFF", "codigo": "1.7.3", "faina": "Descarga Veículos Leves e Utilitários (Longo Curso e Cabotagem)", "taxaTerra": 0.0, "taxaBordo": 0.68881, "cotaPorao": 0.0, "cotaSinaleiro": 1.15, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.7 - ROLL-ON/ROLL-OFF", "codigo": "1.7.3", "faina": "Descarga Veículos Leves e Utilitários (Transbordo)", "taxaTerra": 0.0, "taxaBordo": 0.48216, "cotaPorao": 0.0, "cotaSinaleiro": 1.15, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.7 - ROLL-ON/ROLL-OFF", "codigo": "1.7.4", "faina": "Embarque Veículos Leves e Utilitários (Longo Curso e Cabotagem)", "taxaTerra": 0.0, "taxaBordo": 0.68881, "cotaPorao": 0.0, "cotaSinaleiro": 1.15, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.7 - ROLL-ON/ROLL-OFF", "codigo": "1.7.4", "faina": "Embarque Veículos Leves e Utilitários (Transbordo)", "taxaTerra": 0.0, "taxaBordo": 0.48216, "cotaPorao": 0.0, "cotaSinaleiro": 1.15, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.7 - ROLL-ON/ROLL-OFF", "codigo": "1.7.5", "faina": "Balsa com Cargas na Operação Ro-Ro", "taxaTerra": 0.0, "taxaBordo": 0.83313, "cotaPorao": 0.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.1", "faina": "Granel Sênior - 02 Trabalhadores Porão (red. 01 TPA)", "taxaTerra": 0.0, "taxaBordo": 0.0, "cotaPorao": 1.5, "cotaSinaleiro": 1.4, "cotaGuindasteiro": 1.75, "cotaCMPorao": 0.0, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.2", "faina": "Granel Sênior - 03 Trabalhadores Porão (red. 02 TPAs)", "taxaTerra": 0.0, "taxaBordo": 0.0, "cotaPorao": 1.6, "cotaSinaleiro": 1.8, "cotaGuindasteiro": 1.9, "cotaCMPorao": 0.0, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.3", "faina": "Açúcar Granel Demerara", "taxaTerra": 0.0, "taxaBordo": 0.29, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.7, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.4", "faina": "Escória no Grab (Guin. Bordo)", "taxaTerra": 0.0, "taxaBordo": 0.34637, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.5", "faina": "Escória no Grab (Guin. Terra)", "taxaTerra": 0.25609, "taxaBordo": 0.0, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.6", "faina": "Clínquer de Cimento no Grab", "taxaTerra": 0.25609, "taxaBordo": 0.32759, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.7", "faina": "Coque de Petróleo no Grab (Guin. Bordo)", "taxaTerra": 0.0, "taxaBordo": 0.28824, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.8", "faina": "Coque de Petróleo em Caçambas/Tinas", "taxaTerra": 0.27546, "taxaBordo": 0.27546, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.9", "faina": "Coque de Petróleo Loteando Carga no Cais", "taxaTerra": 0.26169, "taxaBordo": 0.26169, "cotaPorao": 1.0, "cotaSinaleiro": 1.5, "cotaGuindasteiro": 1.85, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.10", "faina": "Barrilha (Guin. Bordo)", "taxaTerra": 0.0, "taxaBordo": 0.28326, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.11", "faina": "Barrilha (Guin. Terra)", "taxaTerra": 0.28326, "taxaBordo": 0.0, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.12", "faina": "Minério de Ferro Shiploader", "taxaTerra": 0.21439, "taxaBordo": 0.20851, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.13", "faina": "Minério de Ferro Grab", "taxaTerra": 0.28328, "taxaBordo": 0.28328, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.14", "faina": "Brita Granéis (Guin. Bordo)", "taxaTerra": 0.0, "taxaBordo": 0.34636, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.15", "faina": "Cimento à granel", "taxaTerra": 0.41388, "taxaBordo": 0.46024, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.16", "faina": "Ilmenita no Grab (Guin. Bordo)", "taxaTerra": 0.0, "taxaBordo": 0.34071, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.17", "faina": "Ilmenita no Grab (Guin. Terra)", "taxaTerra": 0.34069, "taxaBordo": 0.0, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.18", "faina": "Outros Granéis no Grab (Guin. Bordo)", "taxaTerra": 0.0, "taxaBordo": 0.28326, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.19", "faina": "Outros Granéis no Grab (Guin. Terra)", "taxaTerra": 0.25609, "taxaBordo": 0.0, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.20", "faina": "Fertilizantes no Grab (Guin. Bordo)", "taxaTerra": 0.0, "taxaBordo": 0.28326, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.21", "faina": "Fertilizantes no Grab (Guin. Terra)", "taxaTerra": 0.28326, "taxaBordo": 0.0, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.22", "faina": "Milho Importação Operação Navio", "taxaTerra": 0.0, "taxaBordo": 0.28326, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 1.5, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.23", "faina": "Sugador Bomba", "taxaTerra": 0.20351, "taxaBordo": 0.0, "cotaPorao": 1.0, "cotaSinaleiro": 0.0, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 2.0}, {"categoria": "1.8 - GRANÉIS", "codigo": "1.8.24", "faina": "Sugador Portalink", "taxaTerra": 0.14885, "taxaBordo": 0.0, "cotaPorao": 0.0, "cotaSinaleiro": 0.0, "cotaGuindasteiro": 0.0, "cotaCMPorao": 0.0, "cotaCMGeral": 2.0}, {"categoria": "1.9 - PEQUENAS EMBARCAÇÕES", "codigo": "1.9.1", "faina": "Resíduos Sólidos (C. Geral)", "taxaTerra": 1.48141, "taxaBordo": 1.66001, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 0.0}, {"categoria": "1.9 - PEQUENAS EMBARCAÇÕES", "codigo": "1.9.2", "faina": "Espaço Confinado (C. Geral)", "taxaTerra": 1.48141, "taxaBordo": 1.66001, "cotaPorao": 1.0, "cotaSinaleiro": 1.3, "cotaGuindasteiro": 0.0, "cotaCMPorao": 1.5, "cotaCMGeral": 0.0}];
+
+    // Estrutura agrupada para a calculadora
+    const HIERARQUIA = {};
+    DADOS_TABELA.forEach(item => {
+      if(!HIERARQUIA[item.categoria]) HIERARQUIA[item.categoria] = [];
+      HIERARQUIA[item.categoria].push({
+        id: item.codigo,
+        nome: item.faina,
+        taxaTerra: item.taxaTerra,
+        taxaBordo: item.taxaBordo,
+        cotas: {
+          porao: item.cotaPorao,
+          sinaleiro: item.cotaSinaleiro,
+          guindasteiro: item.cotaGuindasteiro,
+          cm_porao: item.cotaCMPorao,
+          cm_geral: item.cotaCMGeral
+        }
+      });
+    });
+
+    // Alternar Abas
+    function trocarAba(aba) {
+      const abaCalc = document.getElementById('abaCalculadora');
+      const abaTab = document.getElementById('abaTabela');
+      const btnCalc = document.getElementById('btnTabCalc');
+      const btnTab = document.getElementById('btnTabTabela');
+
+      if(aba === 'calc') {
+        abaCalc.classList.remove('hidden');
+        abaTab.classList.add('hidden');
+        btnCalc.className = "border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold py-3 px-6 text-sm sm:text-base flex items-center gap-2 transition-colors";
+        btnTab.className = "border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-semibold py-3 px-6 text-sm sm:text-base flex items-center gap-2 transition-colors";
+      } else {
+        abaCalc.classList.add('hidden');
+        abaTab.classList.remove('hidden');
+        btnTab.className = "border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold py-3 px-6 text-sm sm:text-base flex items-center gap-2 transition-colors";
+        btnCalc.className = "border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-semibold py-3 px-6 text-sm sm:text-base flex items-center gap-2 transition-colors";
+      }
+    }
+
+    // Preencher Selects da Calculadora
+    const selectCategoria = document.getElementById('categoria');
+    const selectSubfaina = document.getElementById('subfaina');
+
+    function initCategorias() {
+      const categorias = Object.keys(HIERARQUIA);
+      categorias.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.text = cat;
+        selectCategoria.appendChild(opt);
+      });
+      atualizarSubFainas();
+    }
+
+    function atualizarSubFainas() {
+      selectSubfaina.innerHTML = '';
+      const catAtual = selectCategoria.value;
+      const subfainas = HIERARQUIA[catAtual] || [];
+      
+      subfainas.forEach((item, index) => {
+        const opt = document.createElement('option');
+        opt.value = index; 
+        opt.text = `${item.id} - ${item.nome}`;
+        selectSubfaina.appendChild(opt);
+      });
+    }
+
+    // Lógica do Cálculo
+    function calcularGanhos() {
+      const catAtual = selectCategoria.value;
+      const indexSub = selectSubfaina.value;
+      const cargaSelecionada = HIERARQUIA[catAtual][indexSub];
+      
+      const funcao = document.getElementById('funcao').value;
+      const peso = parseFloat(document.getElementById('peso').value);
+      const isNoturno = document.getElementById('adicionalNoturno').checked;
+      const isDomingo = document.getElementById('domingoFeriado').checked;
+      const tipoGuindaste = document.querySelector('input[name="tipoGuindaste"]:checked').value;
+
+      if (isNaN(peso) || peso <= 0) {
+        alert("Por favor, insira um peso válido maior que zero.");
+        return;
+      }
+
+      const taxaBase = (tipoGuindaste === 'terra') ? cargaSelecionada.taxaTerra : cargaSelecionada.taxaBordo;
+      const cota = cargaSelecionada.cotas[funcao];
+      
+      if (taxaBase === 0) {
+        alert("Atenção: A taxa base da mercadoria para o tipo de Guindaste escolhido é 0 de acordo com a tabela.");
+        return;
+      }
+      if (cota === 0 || cota === undefined) {
+        alert("Atenção: A função selecionada possui cota 0 para esta faina na convenção.");
+        return;
+      }
+
+      const valorBase = taxaBase * peso * cota;
+      let valorNoturno = isNoturno ? valorBase * 0.25 : 0;
+      let valorDomingo = isDomingo ? valorBase * 1.00 : 0;
+      let valorDomingoNoturno = isDomingo && isNoturno ? valorBase * 0.25 : 0;
+      const valorTotal = (valorBase  + valorNoturno + valorDomingo + valorDomingoNoturno); 
+
+      const formatador = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+      
+      const container = document.getElementById('resultadoContainer');
+      container.classList.remove('hidden');
+      void container.offsetWidth; 
+      container.classList.remove('opacity-0', 'translate-y-4');
+      container.classList.add('opacity-100', 'translate-y-0');
+
+      document.getElementById('valorTotal').innerText = formatador.format(valorTotal);
+      const nomeGuindaste = tipoGuindaste === 'terra' ? 'Guindaste Terra' : 'Guindaste Bordo';
+
+      document.getElementById('detalhesCalculo').innerHTML = `
+        <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/50">
+          <span class="text-slate-600 dark:text-slate-400 font-medium">Cálculo Base (Taxa × Peso × Cota)</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200">${formatador.format(valorBase)}</span>
+        </div>
+        <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/50">
+          <span class="text-slate-500 text-xs pl-2">Desmembramento: R$ ${taxaBase.toFixed(5)} (${nomeGuindaste}) × ${peso}t × ${cota.toFixed(2)}</span>
+        </div>
+        ${isNoturno ? `
+        <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/50">
+          <span class="text-slate-600 dark:text-slate-400 font-medium">Adicional Noturno (25%)</span>
+          <span class="font-bold text-brand-500">+ ${formatador.format(valorNoturno)}</span>
+        </div>` : ''}
+        ${isDomingo ? `
+        <div class="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/50">
+          <span class="text-slate-600 dark:text-slate-400 font-medium">Dom/Feriado (100%)</span>
+          <span class="font-bold text-amber-500">+ ${formatador.format(valorDomingo)}</span>
+        </div>` : ''}
+      `;
+    }
+
+    // Renderizar Tabela Completa de Consulta
+    function renderizarTabela(dados) {
+      const corpo = document.getElementById('corpoTabelaTaxas');
+      corpo.innerHTML = '';
+
+      dados.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors";
+        tr.innerHTML = `
+          <td class="p-3 font-mono text-brand-600 dark:text-brand-400 font-bold">${item.codigo}</td>
+          <td class="p-3">
+            <div class="font-semibold text-slate-800 dark:text-slate-200">${item.faina}</div>
+            <div class="text-[11px] text-slate-400">${item.categoria}</div>
+          </td>
+          <td class="p-3 text-right font-mono">${item.taxaTerra > 0 ? 'R$ ' + item.taxaTerra.toFixed(5) : '-'}</td>
+          <td class="p-3 text-right font-mono">${item.taxaBordo > 0 ? 'R$ ' + item.taxaBordo.toFixed(5) : '-'}</td>
+          <td class="p-3 text-center font-mono">${item.cotaPorao.toFixed(2)}</td>
+          <td class="p-3 text-center font-mono">${item.cotaSinaleiro.toFixed(2)}</td>
+          <td class="p-3 text-center font-mono">${item.cotaGuindasteiro.toFixed(2)}</td>
+          <td class="p-3 text-center font-mono">${item.cotaCMPorao.toFixed(2)}</td>
+          <td class="p-3 text-center font-mono">${item.cotaCMGeral.toFixed(2)}</td>
+        `;
+        corpo.appendChild(tr);
+      });
+    }
+
+    // Filtro da Tabela
+    function filtrarTabela() {
+      const busca = document.getElementById('inputBuscaTabela').value.toLowerCase();
+      const filtrados = DADOS_TABELA.filter(item => 
+        item.faina.toLowerCase().includes(busca) || 
+        item.codigo.toLowerCase().includes(busca) ||
+        item.categoria.toLowerCase().includes(busca)
+      );
+      renderizarTabela(filtrados);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCategorias();
+      renderizarTabela(DADOS_TABELA);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Cubos Gaussianos - Lei de Gauss</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+        .situacao {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .positivo { color: #27ae60; font-weight: bold; }
+        .negativo { color: #c0392b; font-weight: bold; }
+        .nulo { color: #7f8c8d; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Análise de Cubos Gaussianos (Lei de Gauss)</h1>
+    <div id="resultados"></div>
+
+    <script>
+        // Dados das situações do Teste 2
+        const dados = [
+            { id: 1, saidas: [5, 3], entradas: [7, 2] },
+            { id: 2, saidas: [10, 3, 5], entradas: [4, 6, 3] },
+            { id: 3, saidas: [2, 8, 5], entradas: [7, 5, 6] }
+        ];
+
+        const container = document.getElementById('resultados');
+
+        dados.forEach(sit => {
+            const somaSaidas = sit.saidas.reduce((a, b) => a + b, 0);
+            const somaEntradas = sit.entradas.reduce((a, b) => a + b, 0);
+            const fluxoLiquido = somaSaidas - somaEntradas;
+
+            let statusClass = 'nulo';
+            let textoCarga = 'Carga total NULA';
+
+            if (fluxoLiquido > 0) {
+                statusClass = 'positivo';
+                textoCarga = 'Carga total POSITIVA';
+            } else if (fluxoLiquido < 0) {
+                statusClass = 'negativo';
+                textoCarga = 'Carga total NEGATIVA';
+            }
+
+            const div = document.createElement('div');
+            div.className = 'situacao';
+            div.innerHTML = `
+                <strong>Situação (${sit.id})</strong><br>
+                Fluxos Saindo: ${sit.saidas.join(' + ')} = +${somaSaidas} N·m²/C<br>
+                Fluxos Entrando: ${sit.entradas.join(' + ')} = -${somaEntradas} N·m²/C<br>
+                Fluxo Líquido: ${fluxoLiquido} N·m²/C<br>
+                Conclusão: <span class="${statusClass}">${textoCarga}</span>
+            `;
+            container.appendChild(div);
+        });
+    </script>
+
+</body>
+</html>

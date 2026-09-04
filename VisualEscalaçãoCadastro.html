@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escalas OGMO Suape - Tempo Real</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-800 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-emerald-400">Status de Escalas OGMO</h1>
+                <p class="text-sm text-slate-400 mt-1">Acompanhamento em tempo real de quem conseguiu escalação.</p>
+            </div>
+            <div class="mt-4 md:mt-0 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-sm">
+                <span id="status-conexao" class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                <span>Monitorando em tempo real</span>
+            </div>
+        </header>
+
+        <!-- Tabela de Escala -->
+        <div class="bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-700">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900/50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                            <th class="py-3 px-6">Matrícula</th>
+                            <th class="py-3 px-6">Nome do Trabalhador</th>
+                            <th class="py-3 px-6 text-center">Status na Escala</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-corpo" class="divide-y divide-slate-700/50 text-sm">
+                        <!-- Dados injetados via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function carregarDados() {
+            try {
+                const resposta = await fetch('novo_data.json');
+                if (!resposta.ok) throw new Error('Erro ao carregar o banco de dados.');
+                
+                let dados = await resposta.json();
+                
+                // Ordena para colocar quem conseguiu no topo (Total Geral maior que 0)
+                dados.sort((a, b) => b["Total Geral"] - a["Total Geral"]);
+
+                const tbody = document.getElementById('tabela-corpo');
+                tbody.innerHTML = '';
+
+                dados.forEach((trab) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-700/30 transition-colors";
+                    
+                    const conseguiu = trab["Total Geral"] > 0;
+                    
+                    tr.innerHTML = `
+                        <td class="py-4 px-6 font-mono text-slate-400">${trab["Matrícula"]}</td>
+                        <td class="py-4 px-6 font-medium text-slate-200">${trab["Nome"]}</td>
+                        <td class="py-4 px-6 text-center">
+                            ${conseguiu 
+                                ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-semibold">Conseguiu Escala</span>' 
+                                : '<span class="text-slate-500 text-xs">-</span>'}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (erro) {
+                console.error(erro);
+                document.getElementById('status-conexao').className = "inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-2";
+            }
+        }
+
+        carregarDados();
+        setInterval(carregarDados, 30000);
+    </script>
+</body>
+</html>
