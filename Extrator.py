@@ -5,7 +5,9 @@ import requests
 from bs4 import BeautifulSoup
 import time
 
-JSON_DATABASE = "novo_data.json"
+
+
+JSON_DATABASE = "novo_data.json" 
 
 def carregar_banco_dados():
     if not os.path.exists(JSON_DATABASE):
