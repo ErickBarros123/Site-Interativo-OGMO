@@ -85,5 +85,11 @@ def puxar_escala_todos_turnos():
         print(f"[AVISO] Nenhum trabalhador da base foi encontrado nas escalas da data de hoje ({data_hoje}).")
 
 if __name__ == "__main__":
+    # Configuração de Tempo Real: Roda sozinho periodicamente (ex: a cada 1 hora = 3600 segundos)
+    INTERVALO_SEGUNDOS = 3600 
+    
     print("=== Robô OGMO de Monitoramento Geral Iniciado ===")
-    puxar_escala_todos_turnos()
+    while True:
+        puxar_escala_todos_turnos()
+        print(f"\nAguardando próxima checagem automática em {INTERVALO_SEGUNDOS // 60} minutos... (Pressione Ctrl+C para encerrar)\n")
+        time.sleep(INTERVALO_SEGUNDOS)
