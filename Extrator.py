@@ -7,7 +7,10 @@ import time
 
 
 
-JSON_DATABASE = "novo_data.json" 
+
+# Define o caminho absoluto com base na pasta onde o Extrator.py está salvo
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+JSON_DATABASE = os.path.join(BASE_DIR, "novo_data.json") 
 
 def carregar_banco_dados():
     if not os.path.exists(JSON_DATABASE):
