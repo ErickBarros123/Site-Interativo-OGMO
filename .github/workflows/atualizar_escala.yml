@@ -1,0 +1,35 @@
+name: Robô OGMO Automático
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependências
+        run: |
+          pip install requests beautifulsoup4 pandas openpyxl
+
+      - name: Executar script de varredura
+        run: python dExtrator.py
+
+      - name: Salvar e atualizar JSON no GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "Robô OGMO"
+          git config --global user.email "robo@ogmo.local"
+          git add novo_data.json
+          git commit -m "Atualização automática de escalas [skip ci]" || exit 0
+          git push 
