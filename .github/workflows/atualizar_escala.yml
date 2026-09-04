@@ -34,3 +34,5 @@ jobs:
           git add novo_data.json
           git diff --staged --quiet || git commit -m "Atualização automática de escalas [skip ci]"
           git push origin HEAD:main
+
+        
