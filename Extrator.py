@@ -15,17 +15,17 @@ JSON_DATABASE = os.path.join(BASE_DIR, "novo_data.json")
 def carregar_banco_dados():
     # Se o arquivo JSON externo não existir, ele cria automaticamente usando a lista embutida acima
     if not os.path.exists(JSON_DATABASE):
-        salvar_banco_dados(BANCO_DADOS_INICIAL)
-        return BANCO_DADOS_INICIAL
+        salvar_banco_dados("novo_data.json")
+        return "novo_data.json"
     
     with open(JSON_DATABASE, "r", encoding="utf-8") as f:
         try:
             dados = json.load(f)
             if not dados:  # Se estiver vazio por algum motivo, usa o embutido
-                return BANCO_DADOS_INICIAL
+                return "novo_data.json"
             return dados
         except json.JSONDecodeError:
-            return BANCO_DADOS_INICIAL
+            return "novo_data.json"
 
 def salvar_banco_dados(dados):
     with open(JSON_DATABASE, "w", encoding="utf-8") as f:
