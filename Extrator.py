@@ -2,30 +2,24 @@ import os
 import json
 from datetime import datetime
 import requests
-from bs4::BeautifulSoup import BeautifulSoup # type: ignore
-import time
 from bs4 import BeautifulSoup
-
-# Base de dados embutida diretamente no código Python
-
+import time
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 JSON_DATABASE = os.path.join(BASE_DIR, "novo_data.json") 
 
 def carregar_banco_dados():
-    # Se o arquivo JSON externo não existir, ele cria automaticamente usando a lista embutida acima
     if not os.path.exists(JSON_DATABASE):
-        salvar_banco_dados("novo_data.json")
-        return "novo_data.json"
+        return []
     
     with open(JSON_DATABASE, "r", encoding="utf-8") as f:
         try:
             dados = json.load(f)
-            if not dados:  # Se estiver vazio por algum motivo, usa o embutido
-                return "novo_data.json"
+            if not dados:
+                return []
             return dados
         except json.JSONDecodeError:
-            return "novo_data.json"
+            return []
 
 def salvar_banco_dados(dados):
     with open(JSON_DATABASE, "w", encoding="utf-8") as f:
@@ -89,10 +83,4 @@ def puxar_escala_todos_turnos():
         print(f"[AVISO] Nenhum trabalhador da base foi encontrado nas escalas da data de hoje ({data_hoje}).")
 
 if __name__ == "__main__":
-    INTERVALO_SEGUNDOS = 3600 
-    
-    print("=== Robô OGMO de Monitoramento Geral Iniciado ===")
-    while True:
-        puxar_escala_todos_turnos()
-        print(f"\nAguardando próxima checagem automática em {INTERVALO_SEGUNDOS // 60} minutos... (Pressione Ctrl+C para encerrar)\n")
-        time.sleep(INTERVALO_SEGUNDOS)
+    puxar_escala_todos_turnos()
